@@ -1,0 +1,90 @@
+<template>
+  <span :style="{ width: width + 'px', height: width + 'px' }" class="icon">
+    <img :src="getImage()" :style="{ 'object-fit': fit }" />
+  </span>
+</template>
+
+<script setup>
+import { ref, reactive, getCurrentInstance } from "vue";
+const { proxy } = getCurrentInstance();
+
+const props = defineProps({
+  fileType: {
+    type: Number,
+  },
+  userId: {
+    type:String,
+  },
+  type:{
+    type: Boolean
+  },
+  iconName: {
+    type: String,
+  },
+  cover: {
+    type: String,
+  },
+  width: {
+    type: Number,
+    default: 32,
+  },
+  fit: {
+    type: String,
+    default: "cover",
+  },
+  saveSf:{
+    type:Boolean
+  }
+});
+
+const fileTypeMap = {
+  0: { desc: "目录", icon: "folder" },
+  1: { desc: "视频", icon: "video" },
+  2: { desc: "音频", icon: "music" },
+  3: { desc: "图片", icon: "image" },
+  4: { desc: "exe", icon: "pdf" },
+  5: { desc: "doc", icon: "word" },
+  6: { desc: "excel", icon: "excel" },
+  7: { desc: "纯文本", icon: "txt" },
+  8: { desc: "程序", icon: "code" },
+  9: { desc: "压缩包", icon: "zip" },
+  10: { desc: "其他文件", icon: "others" },
+  11:{desc: "封禁", icon: "fengjing"}
+};
+
+const getImage = () => {
+  if(props.userId && props.type){
+    return proxy.globalInfo.imageUrl + props.cover+"/"+props.userId+".fengxiang";
+  }
+  if(props.userId){
+    return proxy.globalInfo.imageUrl + props.cover+"/"+props.userId+".root";
+  }
+  if (props.cover) {
+      return proxy.globalInfo.imageUrl + props.cover
+  }
+  let icon = "unknow_icon";
+  if (props.iconName) {
+    icon = props.iconName;
+  } else {
+    console.log(props.fileType);
+    const iconMap = fileTypeMap[props.fileType];
+    if (iconMap != undefined) {
+      icon = iconMap["icon"];
+    }
+  }
+  return new URL(`/src/assets/icon-image/${icon}.png`, import.meta.url).href;
+};
+</script>
+
+<style lang="scss" scoped>
+.icon {
+  text-align: center;
+  display: inline-block;
+  border-radius: 3px;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+</style>
